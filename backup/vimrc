@@ -1,0 +1,293 @@
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+" call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+
+Plugin 'bronson/vim-trailing-whitespace'
+Plugin 'yegappan/mru'
+
+" sudo pip install jedi
+Plugin 'davidhalter/jedi-vim'
+
+Plugin 'altercation/vim-colors-solarized'
+" syntax enable
+" set background=light
+" colorscheme solarized
+" let g:solarized_termcolors=256
+
+Plugin 'Valloric/YouCompleteMe'
+let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from Ctags file
+let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
+let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
+let g:ycm_complete_in_comments = 1 " Completion in comments
+let g:ycm_complete_in_strings = 1 " Completion in string
+
+Plugin 'scrooloose/nerdtree'
+" 关闭vim，如果nerdtree是最后一个窗口
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+" 启动vim自动打开NERDTree
+" autocmd VimEnter * NERDTree
+let NERDTreeIgnore = [".*\.pyc",".*\.swp",".*\.png",".*\.gif",".*\.jpg",".*\.ico","tags",".*\.tar.gz"]
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.DS_Store', '\.db']
+let NERDTreeWinSize=20
+
+Plugin 'scrooloose/syntastic'
+let g:syntastic_check_on_open=1
+let g:syntastic_enable_highlighting = 0
+let g:syntastic_python_checkers=['pyflakes']
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+" Plugin 'tpope/vim-fugitive'
+" plugin from http://vim-scripts.org/vim/scripts.html
+" Plugin 'L9'
+" Git plugin not hosted on GitHub
+" Plugin 'git://git.wincent.com/command-t.git'
+" git repos on your local machine (i.e. when working on your own plugin)
+" Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+" Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Avoid a name conflict with L9
+" Plugin 'user/L9', {'name': 'newL9'}
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+
+" Enable filetype plugins
+filetype plugin indent on
+
+" To ignore plugin indent changes, instead use:
+" filetype plugin on
+"
+" Brief help
+" :PluginList          - list configured plugins
+" :PluginInstall(!)    - install (update) plugins
+" :PluginSearch(!) foo - search (or refresh cache first) for foo
+" :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+nnoremap <silent> <F7> :MRU<CR>
+nnoremap <silent> <F8> :FixWhitespace<CR>
+nnoremap <silent> <F9>  :TlistOpen<CR>
+nnoremap <silent> <F10> :NERDTreeToggle<CR>
+nnoremap <silent> <F12> :Rgrep<CR>
+:let Grep_Default_Filelist = '*.py *.html *.js'
+
+""ctags & taglist""
+:set tags=/home/lian/dev/tags
+let Tlist_Show_One_File=1       "让taglist可以同时展示一个文件的函数列表
+let Tlist_Exit_OnlyWindow=1     "当taglist是最后一个分割窗口时，自动退出vim
+let Tlist_Use_Right_Window=1
+
+
+""""""""""""""set""""""""""""""
+" 打开more选项，列表消息会在全屏填满时暂停，
+" 通过nomore选项关闭就不会有暂停，列表消息会继续进行直到结束为止。
+set nomore
+
+" Sets how many lines of history VIM has to remember
+set history=700
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
+" Turn on the WiLd menu
+set wildmenu
+
+" Ignore compiled files
+set wildignore=*.o,*~,*.pyc
+
+" Set 7 lines to the cursor - when moving vertically using j/k
+set scrolloff=7
+
+" Always show current position
+set ruler
+
+" Height of the command bar
+set cmdheight=1
+
+" Configure backspace so it acts as it should act
+"
+" 设想这样一个情况： 当前光标前面有若干字母， 我们按下 i 键进入了 Insert
+" 模式， 然后输入了 3 个字母， 再按 5 下删除(Backspace)。 默认情况下，
+" VIM 仅能删除我们新输入的 3 个字母， 然后喇叭“嘟嘟”响两声。 如果我们“set
+" backspace=start”， 则可以在删除了新输入的 3 个字母之后， 继续向前删除原有的两个字符。
+"
+" 再设想一个情况： 有若干行文字， 我们把光标移到中间某一行的行首， 按
+" i 键进入 Insert 模式， 然后按一下 Backspace。 默认情况下， 喇叭会“嘟”一声，
+" 然后没有任何动静。 如果我们“set backspace=eol”， 则可以删除前一行行末的回车，
+" 也就是说将两行拼接起来。
+"
+" 当我们设置了自动缩进后， 如果前一行缩进了一定距离， 按下回车后， 下一行也会保持相同的缩进。
+" 默认情况下， 我们不能在 Insert 模式下直接按 Backspace 删除行首的缩进。
+" 如果我们“set backspace=indent”， 则可以开启这一项功能。
+set backspace=eol,start,indent
+
+" 默认情况下， 在 VIM 中当光标移到一行最左边的时候， 我们继续按左键，
+" 光标不能回到上一行的最右边。 同样地， 光标到了一行最右边的时候， 我们不能通过继续按右跳到下一行的最左边。
+" 但是， 通过设置 whichwrap 我们可以对一部分按键开启这项功能。 如果想对某一个或几个按键开启到头后自动折向下一行的功能，
+" 可以把需要开启的键的代号写到 whichwrap 的参数列表中， 各个键之间使用逗号分隔。
+" 以下是 whichwrap 支持的按键名称列表：
+"
+" b  在 Normal 或 Visual 模式下按删除(Backspace)键。
+" s  在 Normal 或 Visual 模式下按空格键。
+" h  在 Normal 或 Visual 模式下按 h 键。
+" l  在 Normal 或 Visual 模式下按 l 键。
+" <  在 Normal 或 Visual 模式下按左方向键。
+" >  在 Normal 或 Visual 模式下按右方向键。
+" ~  在 Normal 模式下按 ~ 键(翻转当前字母大小写)。
+" [  在 Insert 或 Replace 模式下按左方向键。
+" ]  在 Insert 或 Replace 模式下按右方向键。
+" set whichwrap+=<,>,h,l
+
+" Ignore case when searching
+set ignorecase
+
+" When searching try to be smart about cases
+" 当搜索的表达式中包含大写字母时，则不会进行忽略。
+set smartcase
+
+" Highlight search results
+set hlsearch
+:nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+
+" Makes search act like search in modern browsers
+" 搜索时一边输入一边显示效果
+" set noincsearch 取消
+set incsearch
+
+" Show matching brackets when text indicator is over them
+set showmatch
+" How many tenths of a second to blink when matching brackets
+" set mat=2
+
+" Set utf8 as standard encoding and en_US as the standard language
+set encoding=utf8
+set fileencoding=utf-8
+
+" Turn backup off, since most stuff is in SVN, git et.c anyway...
+set nobackup
+set nowb
+set noswapfile
+
+" Use spaces instead of tabs
+set expandtab
+
+" Be smart when using tabs
+set smarttab
+
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+
+" Auto indent
+set autoindent
+
+" Smart indent
+set smartindent
+
+" 是一种 word wrap 的功能，从左起算之固定每行的最大字符宽度。
+" 超过此宽度就会自动折行，这可是真的折行，也就是说在折行处会插入 EOL。
+" 预设是 0，也就是没有 word wrap 的功能。
+set textwidth=79
+
+" 这也是折行功能，可是只是屏幕效果的折行，实际上并没有插入 EOL。
+" set wrap
+
+" the root path when use :find to find a file
+set path=/home/lian/dev/**
+
+set number
+
+"vim中使用鼠标
+set mouse=a
+
+
+""""""""""""""function""""""""""""""
+
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+" Remember info about open buffers on close
+set viminfo^=%
+
+"#c7edcc
+"red:204;green:232;blue:207
+"色调85；饱和度123；亮度205
+hi normal   ctermfg=white  ctermbg=black
+hi nontext  ctermfg=blue   ctermbg=black
+
+set foldmethod=manual "代码折叠
+set relativenumber
+set matchtime=1
+syntax on            " 语法高亮
+
+"自动补全括号等
+""inoremap ( ()<LEFT>
+""inoremap [ []<LEFT>
+""inoremap { {}<LEFT>
+""inoremap ' ''<LEFT>
+""inoremap " ""<LEFT>
+""inoremap < <><LEFT>
+
+
+" In most IDEs, you normally type some code, press <C-Space> for a completion popup menu, type some more characters to select the menu item you want, then hit <Enter> to insert that completion into the code. With Vim's initial popup menu settings, the behavior of the popup menu is a little less pleasant (for some people).
+" The first step to improve the menu behavior is to execute this command:
+set completeopt=menuone,longest,preview
+" The above command will change the 'completeopt' option so that Vim's popup menu doesn't select the first completion item, but rather just inserts the longest common text of all matches; and the menu will come up even if there's only one match. (The longest setting is responsible for the former effect and the menuone is responsible for the latter.)
+""""""""""""""not used""""""""""""""
+
+" Don't redraw while executing macros (good performance config)
+" 在执行宏命令时，不进行显示重绘；在宏命令执行完成后，一次性重绘，以便提高性能。
+" set lazyredraw
+
+" For regular expressions turn magic on
+"
+" magic就是设置哪些元字符要加反斜杠哪些不用加的。简单来说：
+" magic(\m)：除了 $ . * ^ 之外其他元字符都要加反斜杠。
+" nomagic(\M)：除了 $ ^ 之外其他元字符都要加反斜杠。
+"
+" 这个设置也可以在正则表达式中通过 \m \M 开关临时切换。
+" \m 后面的正则表达式会按照 magic 处理，
+" \M 后面的正则表达式按照 nomagic 处理，而忽略实际的magic设置。
+"
+" 例如：
+" /\m.* # 查找任意字符串
+" /\M.* # 查找字符串 .* （点号后面跟个星号）
+"
+" 另外还有更强大的 \v 和 \V。
+" \v（即 very magic 之意）：任何元字符都不用加反斜杠
+" \V（即 very nomagic 之意）：任何元字符都必须加反斜杠
+"
+" 例如：
+" /\v(a.c){3}$ # 查找行尾的abcaccadc
+" /\m(a.c){3}$ # 查找行尾的(abc){3}
+" /\M(a.c){3}$ # 查找行尾的(a.c){3}
+" /\V(a.c){3}$ # 查找任意位置的(a.c){3}$
+"
+" 默认设置是 magic，vim也推荐大家都使用magic的设置，在有特殊需要时，直接通过 \v\m\M\V 即可。
+" set magic
+" set nomagic
+
+" No annoying sound on errors
+" set novisualbell
+" set t_vb=
+" set tm=500
+
+
+
+" set modifiable
