@@ -1,4 +1,377 @@
+[toc]
+
+
 # Python
+
+``` python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+```
+
+统一函数和类命名：类名用 **驼峰命名**， 函数和方法名，用 `小写_和_下划线`。总是用 `self` 作为方法的第一个参数。
+
+## slice
+
+### for string
+
+``` python
+>>> word = 'Help' + 'A'
+>>> word
+'HelpA'
+```
+方便记忆的方法
+```
+ +---+---+---+---+---+
+ | H | e | l | p | A |
+ +---+---+---+---+---+
+ 0   1   2   3   4   5
+-5  -4  -3  -2  -1   0
+```
+索引切片可以有默认值，切片时，忽略第一个索引的话，默认为 0，忽略第二个索引，默认为字符串的长度:
+``` python
+>>> word[:2]    # The first two characters
+'He'
+>>> word[2:]    # Everything except the first two characters
+'lpA'
+```
+切片操作有个有用的不变性：`s[:i] + s[i:]` 等于 `s`:
+``` python
+>>> word[:2] + word[2:]
+'HelpA'
+>>> word[:3] + word[3:]
+'HelpA'
+```
+索引也可以是负数，这将导致从右边开始计算。例如:
+``` python
+>>> word[-1]     # The last character
+'A'
+>>> word[-2]     # The last-but-one character
+'p'
+>>> word[-2:]    # The last two characters
+'pA'
+>>> word[:-2]    # Everything except the last two characters
+'Hel'
+```
+
+### for list
+
+就像字符串索引，列表从 0 开始检索。列表可以被切片和连接:
+``` python
+>>> a[0]
+'spam'
+>>> a[3]
+1234
+>>> a[-2]
+100
+>>> a[1:-1]
+['eggs', 100]
+>>> a[:2] + ['bacon', 2*2]
+['spam', 'eggs', 'bacon', 4]
+>>> 3*a[:3] + ['Boo!']
+['spam', 'eggs', 100, 'spam', 'eggs', 100, 'spam', 'eggs', 100, 'Boo!']
+```
+所有的切片操作都会返回新的列表，包含求得的元素。这意味着以下的切片操作返回列表 a 的一个浅拷贝的副本:
+``` python
+>>> a[:]
+['spam', 'eggs', 100, 1234]
+```
+不像 **不可变的** 字符串，列表允许修改元素:
+``` python
+>>> a
+['spam', 'eggs', 100, 1234]
+>>> a[2] = a[2] + 23
+>>> a
+['spam', 'eggs', 123, 1234]
+```
+也可以对切片赋值，此操作可以改变列表的尺寸，或清空它:
+``` python
+>>> # Replace some items:
+... a[0:2] = [1, 12]
+>>> a
+[1, 12, 123, 1234]
+>>> # Remove some:
+... a[0:2] = []
+>>> a
+[123, 1234]
+>>> # Insert some:
+... a[1:1] = ['bletch', 'xyzzy']
+>>> a
+[123, 'bletch', 'xyzzy', 1234]
+>>> # Insert (a copy of) itself at the beginning
+>>> a[:0] = a
+>>> a
+[123, 'bletch', 'xyzzy', 1234, 123, 'bletch', 'xyzzy', 1234]
+>>> # Clear the list: replace all items with an empty list
+>>> a[:] = []
+>>> a
+[]
+```
+允许嵌套列表（创建一个包含其它列表的列表），例如:
+``` python
+>>> q = [2, 3]
+>>> p = [1, q, 4]
+>>>> p[1].append('xtra')
+>>> p
+[1, [2, 3, 'xtra'], 4]
+>>> q
+[2, 3, 'xtra']
+```
+> NOTE: `p[1]` 和 `q` 实际上指向同一个对象！我们会在后面的 *object semantics* 中继续讨论。
+
+## for loop
+
+### 使用切片修改你迭代的序列
+
+如果你想要修改你迭代的序列，使用切片可以很方便的做到这一点:
+``` python
+>>> # Measure some strings:
+... a = ['cat', 'window', 'defenestrate']
+>>> for x in a:
+...     print(x, len(x))
+...
+cat 3
+window 6
+defenestrate 12
+>>> for x in a[:]: # make a slice copy of the entire list
+...    if len(x) > 6: a.insert(0, x)
+...
+>>> a
+['defenestrate', 'cat', 'window', 'defenestrate']
+```
+
+### enumerate()
+
+在序列中循环时，索引位置和对应值可以使用 `enumerate()` 函数同时得到:
+``` python
+>>> for i, v in enumerate(['tic', 'tac', 'toe']):
+...     print(i, v)
+...
+0 tic
+1 tac
+2 toe
+```
+
+### reversed()
+
+需要逆向循环序列的话，先正向定位序列，然后调用 reversed() 函数:
+``` python
+>>> for i in reversed(range(1, 10, 2)):
+...     print(i)
+...
+9
+7
+5
+3
+1
+```
+
+### sorted()
+
+要按排序后的顺序循环序列的话，使用 sorted() 函数，它不改动原序列，而是生成一个新的已排序的序列:
+``` python
+>>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+>>> for f in sorted(set(basket)):
+...     print(f)
+...
+apple
+banana
+orange
+pear
+```
+
+## def function()
+
+### lambda
+
+出于实际需要，有几种通常在函数式编程语言例如 Lisp 中出现的功能加入到了 Python。通过 lambda 关键字，可以创建短小的匿名函数。这里有一个函数返回它的两个参数的和： lambda a, b: a+b。 Lambda 形式可以用于任何需要的函数对象。出于语法限制，它们只能有一个单独的表达式。语义上讲，它们只是普通函数定义中的一个语法技巧。类似于嵌套函数定义，lambda 形式可以从外部作用域引用变量:
+``` python
+>>> def make_incrementor(n):
+...     return lambda x: x + n
+...
+>>> f = make_incrementor(42)
+>>> f(0)
+42
+>>> f(1)
+43
+```
+
+### docstrings
+
+``` python
+>>> def my_function():
+...     """Do nothing, but document it.
+...
+...     No, really, it doesn't do anything.
+...     """
+...     pass
+...
+>>> print(my_function.__doc__)
+Do nothing, but document it.
+
+    No, really, it doesn't do anything.
+```
+
+### TODO：函数定义
+
+函数，函数局部变量引用，首先在 **局部符号表** 中查找，然后是 **包含函数的局部符号表**，然后是 **全局符号表**，最后是 **内置名字表**。因此，全局变量不能在函数中直接赋值（除非用 `global` 语句命名），尽管他们可以被引用。
+``` python
+>>> def fib(n):    # write Fibonacci series up to n
+...     """Print a Fibonacci series up to n."""
+...     a, b = 0, 1
+...     while a < n:
+...         print(a, end=' ')
+...         a, b = b, a+b
+...     print()
+...
+>>> # Now call the function we just defined:
+... fib(2000)
+0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597
+```
+一个函数定义会在当前符号表内引入函数名。函数名指代的值（即函数体）有一个被 Python 解释器认定为 用户自定义函数 的类型。 这个值可以赋予其他的名字（即变量名），然后它也可以被当做函数使用。这可以作为通用的重命名机制:
+``` python
+>>> fib
+<function fib at 10042ed0>
+>>> f = fib
+>>> f(100)
+0 1 1 2 3 5 8 13 21 34 55 89
+```
+
+## list
+
+### basic method
+
+``` python
+>>> a = [66.25, 333, 333, 1, 1234.5]
+>>> print(a.count(333), a.count(66.25), a.count('x'))
+2 1 0
+>>> a.insert(2, -1)
+>>> a.append(333)
+>>> a
+[66.25, 333, -1, 333, 1, 1234.5, 333]
+>>> a.index(333)
+1
+>>> a.remove(333)
+>>> a
+[66.25, -1, 333, 1, 1234.5, 333]
+>>> a.reverse()
+>>> a
+[333, 1234.5, 1, 333, -1, 66.25]
+>>> a.sort()
+>>> a
+[-1, 1, 66.25, 333, 333, 1234.5]
+```
+
+### 把链表当作栈使用
+
+用 `append()` 方法可以把一个元素添加到堆栈顶。用不指定索引的 `pop()` 方法可以把一个元素从堆栈顶释放出来。例如:
+``` python
+>>> stack = [3, 4, 5]
+>>> stack.append(6)
+>>> stack.append(7)
+>>> stack
+[3, 4, 5, 6, 7]
+>>> stack.pop()
+7
+>>> stack
+[3, 4, 5, 6]
+>>> stack.pop()
+6
+>>> stack.pop()
+5
+>>> stack
+[3, 4]
+```
+
+### 使用 `collections.deque` 实现队列
+
+它为在首尾两端快速插入和删除而设计:
+
+``` python
+>>> from collections import deque
+>>> queue = deque(["Eric", "John", "Michael"])
+>>> queue.append("Terry")           # Terry arrives
+>>> queue.append("Graham")          # Graham arrives
+>>> queue.popleft()                 # The first to arrive now leaves
+'Eric'
+>>> queue.popleft()                 # The second to arrive now leaves
+'John'
+>>> queue                           # Remaining queue in order of arrival
+deque(['Michael', 'Terry', 'Graham'])
+```
+
+### 列表推导式
+
+列表推导式为从序列中创建列表提供了一个简单的方法。普通的应用程式通过将一些操作应用于序列的每个成员并通过返回的元素创建列表，或者通过满足特定条件的元素创建子序列。
+
+例如, 假设我们创建一个 `squares` 列表, 可以像下面方式:
+``` python
+>>> squares = []
+>>> for x in range(10):
+...     squares.append(x**2)
+...
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+我们同样能够达到目的采用下面的方式:
+``` python
+squares = [x**2 for x in range(10)]
+```
+这也相当于 `squares = map(lambda x: x**2, range(10))`，但是上面的方式显得简洁以及具有可读性。
+
+列表推导式由包含一个表达式的括号组成，表达式后面跟随一个 `for` 子句，之后可以有零或多个 `for` 或 `if` 子句。结果是一个列表，由表达式依据其后面的 `for` 和 `if` 子句上下文计算而来的结果构成。
+
+例如，如下的列表推导式结合两个列表的元素，如果元素之间不相等的话:
+``` python
+>>> [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y]
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+```
+等同于:
+``` python
+>>> combs = []
+>>> for x in [1,2,3]:
+...     for y in [3,1,4]:
+...         if x != y:
+...             combs.append((x, y))
+...
+>>> combs
+[(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+```
+值得注意的是在上面两个方法中的 `for` 和 `if` 语句的顺序。
+``` python
+>>> vec = [-4, -2, 0, 2, 4]
+>>> # create a new list with the values doubled
+>>> [x*2 for x in vec]
+[-8, -4, 0, 4, 8]
+>>> # filter the list to exclude negative numbers
+>>> [x for x in vec if x >= 0]
+[0, 2, 4]
+>>> # apply a function to all the elements
+>>> [abs(x) for x in vec]
+[4, 2, 0, 2, 4]
+>>> # call a method on each element
+>>> freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
+>>> [weapon.strip() for weapon in freshfruit]
+['banana', 'loganberry', 'passion fruit']
+>>> # create a list of 2-tuples like (number, square)
+>>> [(x, x**2) for x in range(6)]
+[(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
+>>> # the tuple must be parenthesized, otherwise an error is raised
+>>> [x, x**2 for x in range(6)]
+  File "<stdin>", line 1, in ?
+    [x, x**2 for x in range(6)]
+               ^
+SyntaxError: invalid syntax
+>>> # flatten a list using a listcomp with two 'for'
+>>> vec = [[1,2,3], [4,5,6], [7,8,9]]
+>>> [num for elem in vec for num in elem]
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+# TODO
+
+## unicode
+
+---
 
 ```
 要配制成默认的话，需要创建或修改配置文件（linux的文件在~/.pip/pip.conf，windows在%HOMEPATH%\pip\pip.ini），修改内容为：
@@ -7,7 +380,6 @@ code:
 index-url = http://pypi.douban.com/simple
 ```
 
-
 ```python
 def judgePasswordStrength(password):
     strengthLength = max(0, len(password) - 5)
@@ -15,6 +387,23 @@ def judgePasswordStrength(password):
     flags = [bool(set(password) & set(s)) \
             for s in [ascii_lowercase, ascii_uppercase, digits, punctuation]]
     return min(flags.count(True), strengthLength)
+```
+
+# other
+
+
+## python3 special
+
+- print
+
+```
+用一个逗号结尾就可以禁止输出换行:
+>>> a, b = 0, 1
+>>> while b < 1000:
+...     print(b, end=',') # notice here
+...     a, b = b, a+b
+...
+1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,
 ```
 
 ## dubug Python
@@ -93,14 +482,7 @@ def demo():
 > or 找到第一个真值后会忽略计算剩余的表达式。
 > 注意到：返回的并不是布尔值，而是其中某个参与比较的表达式值。
 
-## Code Snippet
-
-- `DATABASE_NAME=os.path.join(os.path.dirname(__file__),'myAPP/mydata.db')`
-其中 os.path.dirname(__file__)函数用于取出settings.py所在文件夹的位置，在用os.path.join()函数将该位置和后面指定的'myAPP/mydata.db'  字符串连接一起，实现sqlite3数据库文件mydata.db具体存放的位置。
-
-`repo_share_group = filter(lambda i: i.repo_id == repo_id, repo_share_group)`
-
-# Python Code Snippets
+## Python Code Snippets
 
 ```
 第4章 Python对象
@@ -127,7 +509,7 @@ idea 完整熟练
 完整熟练
 ```
 
-#### max()
+## max()
 
 ```
 >>> lis = [(1,'a'),(3,'c'), (4,'e'), (-1,'z')]
@@ -150,7 +532,7 @@ idea 完整熟练
 - http://code.activestate.com/recipes/389659-min-and-max-with-key-argument/
 - https://wiki.python.org/moin/HowTo/Sorting
 
-#### Python单步调试
+## Python单步调试
 
 在需要单步调试的地方加上面这句，运行程序后中断在此，然后h查看指令进行一步步细细调试
 
@@ -159,7 +541,7 @@ import pdb;
 pdb.set_trace()
 ```
 
-#### 装饰器
+## 装饰器
 
 Python 会将 `login` 的参数直接传给 `__decorator` 这个函数。我们可以直接在 `__decorator` 中使用 `user` 变量
 ```
@@ -200,10 +582,7 @@ result2 = login('candy');
 print result2
 ```
 
-
-
-
-#### Lambda, filter, reduce and map
+## Lambda, filter, reduce and map
 
 - lambda
 ```
@@ -258,9 +637,9 @@ Calculating the sum of the numbers from 1 to 100:
 5050
 ```
 
-#### 多继承机制（mro：method resolution orde）
+## 多继承机制（mro：method resolution orde）
 
-###### 说明
+### 说明
 
 - 如果继承至一个基类：`class B(A)`
 > 这时B的mro序列为[B,A]
@@ -316,7 +695,7 @@ mro(G) = [G] + merge(mro[E], mro[F], [E,F])
        = [G,E,A,F,B,C] + merge([O], [O])
        = [G,E,A,F,B,C,O]
 ```
-###### 示例
+### 示例
 
 ```python
 class A(object):
@@ -403,3 +782,4 @@ super( CustomImageStorage,self).save(name, content)
 ## test seahub
 
 `py.test tests/api/test_accounts.py::AccountsApiTest::test_update_account_intro`
+
