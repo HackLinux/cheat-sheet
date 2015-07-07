@@ -367,6 +367,188 @@ SyntaxError: invalid syntax
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
 ```
 
+### del 语句
+
+有个方法可以从列表中按给定的索引而不是值来删除一个子项： `del` 语句。它不同于有返回值的 `pop()` 方法。语句 `del` 还可以从列表中删除切片或清空整个列表（我们以前介绍过一个方法是将空列表赋值给列表的切片）。例如:
+``` python
+>>> a = [-1, 1, 66.25, 333, 333, 1234.5]
+>>> del a[0]
+>>> a
+[1, 66.25, 333, 333, 1234.5]
+>>> del a[2:4]
+>>> a
+[1, 66.25, 1234.5]
+>>> del a[:]
+>>> a
+[]
+```
+
+### 集合
+
+Python 还包含了一个数据类型 —— `set` （集合）。集合是一个无序不重复元素的集。基本功能包括关系测试和消除重复元素。集合对象还支持 `union`（联合），`intersection`（交），`difference`（差）和 `sysmmetric difference`（对称差集）等数学运算。
+
+大括号或 `set()` 函数可以用来创建集合。注意：想要创建空集合，你必须使用 `set()` 而不是 `{}`。后者用于创建空字典，我们在下一节中介绍的一种数据结构。
+
+以下是一个简单的演示:
+
+``` python
+>>> basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
+>>> print(basket)                      # show that duplicates have been removed
+{'orange', 'banana', 'pear', 'apple'}
+>>> 'orange' in basket                 # fast membership testing
+True
+>>> 'crabgrass' in basket
+False
+
+>>> # Demonstrate set operations on unique letters from two words
+...
+>>> a = set('abracadabra')
+>>> b = set('alacazam')
+>>> a                                  # unique letters in a
+{'a', 'r', 'b', 'c', 'd'}
+>>> a - b                              # letters in a but not in b
+{'r', 'd', 'b'}
+>>> a | b                              # letters in either a or b
+{'a', 'c', 'r', 'd', 'b', 'm', 'z', 'l'}
+>>> a & b                              # letters in both a and b
+{'a', 'c'}
+>>> a ^ b                              # letters in a or b but not both
+{'r', 'd', 'b', 'm', 'z', 'l'}
+```
+类似 for lists，这里有一种集合推导式语法:
+``` python
+>>> a = {x for x in 'abracadabra' if x not in 'abc'}
+>>> a
+{'r', 'd'}
+```
+
+### 字典
+
+一个小示例:
+``` python
+>>> tel = {'jack': 4098, 'sape': 4139}
+>>> tel['guido'] = 4127
+>>> tel
+{'sape': 4139, 'guido': 4127, 'jack': 4098}
+>>> tel['jack']
+4098
+>>> del tel['sape']
+>>> tel['irv'] = 4127
+>>> tel
+{'guido': 4127, 'irv': 4127, 'jack': 4098}
+>>> list(tel.keys())
+['irv', 'guido', 'jack']
+>>> sorted(tel.keys())
+['guido', 'irv', 'jack']
+>>> 'guido' in tel
+True
+>>> 'jack' not in tel
+False
+```
+
+`dict()` 构造函数可以直接从 `key-value` 对中创建字典:
+``` python
+>>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
+{'sape': 4139, 'jack': 4098, 'guido': 4127}
+```
+此外，字典推导式可以从任意的键值表达式中创建字典:
+``` python
+>>> {x: x**2 for x in (2, 4, 6)}
+{2: 4, 4: 16, 6: 36}
+```
+如果关键字都是简单的字符串，有时通过关键字参数指定 `key-value` 对更为方便:
+``` python
+>>> dict(sape=4139, guido=4127, jack=4098)
+{'sape': 4139, 'jack': 4098, 'guido': 4127}
+```
+### 循环技巧
+
+在字典中循环时，关键字和对应的值可以使用 `iteritems()` 方法同时解读出来:
+``` python
+>>> knights = {'gallahad': 'the pure', 'robin': 'the brave'}
+>>> for k, v in knights.items():
+...     print(k, v)
+...
+gallahad the pure
+robin the brave
+```
+在序列中循环时，索引位置和对应值可以使用 `enumerate()` 函数同时得到:
+``` python
+>>> for i, v in enumerate(['tic', 'tac', 'toe']):
+...     print(i, v)
+...
+0 tic
+1 tac
+2 toe
+```
+同时循环两个或更多的序列，可以使用 `zip()` 整体打包:
+``` python
+>>> questions = ['name', 'quest', 'favorite color']
+>>> answers = ['lancelot', 'the holy grail', 'blue']
+>>> for q, a in zip(questions, answers):
+...     print('What is your {0}?  It is {1}.'.format(q, a))
+...
+What is your name?  It is lancelot.
+What is your quest?  It is the holy grail.
+What is your favorite color?  It is blue.
+```
+需要逆向循环序列的话，先正向定位序列，然后调用 `reversed()` 函数:
+``` python
+>>> for i in reversed(range(1, 10, 2)):
+...     print(i)
+...
+9
+7
+5
+3
+1
+```
+要按排序后的顺序循环序列的话，使用 `sorted()` 函数，它不改动原序列，而是生成一个新的已排序的序列:
+``` python
+>>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+>>> for f in sorted(set(basket)):
+...     print(f)
+...
+apple
+banana
+orange
+pear
+```
+
+### 短路操作符
+
+逻辑操作符 `and` 和 `or` 也称作短路操作符：它们的参数从左向右解析，一旦结果可以确定就停止。例如，如果 A 和 C 为真而 B 为假， `A and B and C` 不会解析 C。作用于一个普通的非逻辑值时，短路操作符的返回值通常是最后一个变量。
+
+## 模块
+
+除了包含函数定义外，模块也可以包含可执行语句。这些语句一般用来初始化模块。他们仅在 第一次 被导入的地方执行一次。
+
+每个模块都有自己 **私有的符号表**，被模块内所有定义的函数作为全局符号表使用。因此，模块的作者可以在模块内部使用全局变量，而无需担心它与某个用户的全局变量意外冲突
+
+### 作为脚本来执行模块
+
+当你使用以下方式运行 Python 模块时，模块中的代码便会被执行:
+``` python
+python fibo.py <arguments>
+```
+模块中的代码会被执行，就像导入它一样，不过此时 `__name__ `被设置为 `__main__`。这相当于，如果你在模块后加入如下代码:
+``` python
+if __name__ == "__main__":
+    import sys
+    fib(int(sys.argv[1]))
+```
+就可以让此文件像作为模块导入时一样作为脚本执行。此代码只有在模块作为 “main” 文件执行时才被调用:
+``` python
+$ python fibo.py 50
+1 1 2 3 5 8 13 21 34
+```
+如果模块被导入，不会执行这段代码:
+``` pythopn
+>>> import fibo
+>>>
+```
+这通常用来为模块提供一个便于测试的用户接口（将模块作为脚本执行测试需求）。
+
 # TODO
 
 ## unicode
