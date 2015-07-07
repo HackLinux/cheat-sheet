@@ -385,3 +385,6 @@ Basically use get when you want to get a single unique object, and filter when y
 
 
 {{ forloop.count }}
+
+request.POST  # Only handles form data.  Only works for 'POST' method.
+request.DATA  # Handles arbitrary data.  Works for 'POST', 'PUT' and 'PATCH' methods.

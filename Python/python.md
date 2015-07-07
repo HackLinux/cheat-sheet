@@ -383,7 +383,7 @@ SyntaxError: invalid syntax
 []
 ```
 
-### 集合
+## 集合
 
 Python 还包含了一个数据类型 —— `set` （集合）。集合是一个无序不重复元素的集。基本功能包括关系测试和消除重复元素。集合对象还支持 `union`（联合），`intersection`（交），`difference`（差）和 `sysmmetric difference`（对称差集）等数学运算。
 
@@ -422,7 +422,7 @@ False
 {'r', 'd'}
 ```
 
-### 字典
+## 字典
 
 一个小示例:
 ``` python
@@ -461,7 +461,7 @@ False
 >>> dict(sape=4139, guido=4127, jack=4098)
 {'sape': 4139, 'jack': 4098, 'guido': 4127}
 ```
-### 循环技巧
+## 循环技巧
 
 在字典中循环时，关键字和对应的值可以使用 `iteritems()` 方法同时解读出来:
 ``` python
@@ -515,7 +515,7 @@ orange
 pear
 ```
 
-### 短路操作符
+## 短路操作符
 
 逻辑操作符 `and` 和 `or` 也称作短路操作符：它们的参数从左向右解析，一旦结果可以确定就停止。例如，如果 A 和 C 为真而 B 为假， `A and B and C` 不会解析 C。作用于一个普通的非逻辑值时，短路操作符的返回值通常是最后一个变量。
 
@@ -549,10 +549,241 @@ $ python fibo.py 50
 ```
 这通常用来为模块提供一个便于测试的用户接口（将模块作为脚本执行测试需求）。
 
+### 模块的搜索路径
+1. 输入脚本的目录（当前目录）。
+2. 环境变量 `PYTHONPATH` 表示的目录列表中搜索 (这和 `shell `变量 `PATH` 具有一样的语法，即一系列目录名的列表)。
+3. `Python` 默认安装路径中搜索。
+
+
+## 包
+
+需要注意的是使用 `from package import item` 方式导入包时，这个子项（`item`）既可以是包中的一个子模块（或一个子包），也可以是包中定义的其它命名，像函数、类或变量。`import` 语句首先核对是否包中有这个子项，如果没有，它假定这是一个模块，并尝试加载它。如果没有找到它，会引发一个 `ImportError` 异常。
+
+相反，使用类似 `import item.subitem.subsubitem` 这样的语法时，这些子项必须是包，最后的子项可以是包或模块，但不能是前面子项中定义的类、函数或变量。
+
+``` python
+sound/                          Top-level package
+      __init__.py               Initialize the sound package
+      formats/                  Subpackage for file format conversions
+              __init__.py
+              wavread.py
+              wavwrite.py
+              aiffread.py
+              aiffwrite.py
+              auread.py
+              auwrite.py
+              ...
+      effects/                  Subpackage for sound effects
+              __init__.py
+              echo.py
+              surround.py
+              reverse.py
+              ...
+      filters/                  Subpackage for filters
+              __init__.py
+              equalizer.py
+              vocoder.py
+              karaoke.py
+              ...
+```
+
+###  `from Sound.Effects import *`
+
+`sounds/effects/__init__.py` 这个文件可能包括如下代码:
+``` python
+__all__ = ["echo", "surround", "reverse"]
+```
+这意味着 `from Sound.Effects import *` 语句会从 `sound` 包中导入以上三个已命名的子模块。
+
+### 使用相对路径导入
+
+以 `surround` 模块为例，你可以这样用:
+```
+from . import echo
+from .. import formats
+from ..filters import equalizer
+```
+
+## str.format()
+``` python
+>>> print('We are the {} who say "{}!"'.format('knights', 'Ni'))
+We are the knights who say "Ni!"
+```
+大括号和其中的字符会被替换成传入 `str.format()` 的参数。大括号中的数值指明使用传入 `str.format()` 方法的对象中的哪一个:
+``` python
+>>> print('{0} and {1}'.format('spam', 'eggs'))
+spam and eggs
+>>> print('{1} and {0}'.format('spam', 'eggs'))
+eggs and spam
+```
+如果在 `str.format()` 调用时使用关键字参数，可以通过参数名来引用值:
+``` python
+>>> print('This {food} is {adjective}.'.format(
+...       food='spam', adjective='absolutely horrible'))
+This spam is absolutely horrible.
+```
+定位和关键字参数可以组合使用:
+``` python
+>>> print('The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred',                                                other='Georg'))
+The story of Bill, Manfred, and Georg.
+```
+`!a` (应用 `ascii()`)，`!s` （应用 `str()`）和 `!r` （应用 `repr()` ）可以在格式化之前转换值:
+``` python
+>>> import math
+>>> print('The value of PI is approximately {}.'.format(math.pi))
+The value of PI is approximately 3.14159265359.
+>>> print('The value of PI is approximately {!r}.'.format(math.pi))
+The value of PI is approximately 3.141592653589793.
+```
+字段名后允许可选的 `:` 和格式指令。这允许对值的格式化加以更深入的控制。下例将 `Pi` 转为三位精度。
+``` python
+>>> import math
+>>> print('The value of PI is approximately {0:.3f}.'.format(math.pi))
+The value of PI is approximately 3.142.
+```
+在字段后的 `:` 后面加一个整数会限定该字段的最小宽度，这在美化表格时很有用:
+``` python
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
+>>> for name, phone in table.items():
+...     print('{0:10} ==> {1:10d}'.format(name, phone))
+...
+Jack       ==>       4098
+Dcab       ==>       7678
+Sjoerd     ==>       4127
+```
+如果你有个实在是很长的格式化字符串，不想分割它。如果你可以用命名来引用被格式化的变量而不是位置就好了。有个简单的方法，可以传入一个字典，用中括号访问它的键:
+``` python
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
+          'Dcab: {0[Dcab]:d}'.format(table))
+Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+```
+也可以用 `**` 标志将这个字典以关键字参数的方式传入:
+``` python
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+>>> print('Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table))
+Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+```
+这种方式与新的内置函数 `vars()` 组合使用非常有效。该函数返回包含所有局部变量的字典。
+
+##异常
+
+### 用户自定义异常
+
+在程序中可以通过创建新的异常类型来命名自己的异常（Python 类的内容请参见 类 ）。异常类通常应该直接或间接的从 `Exception` 类派生，例如:
+
+``` python
+>>> class MyError(Exception):
+...     def __init__(self, value):
+...         self.value = value
+...     def __str__(self):
+...         return repr(self.value)
+...
+>>> try:
+...     raise MyError(2*2)
+... except MyError as e:
+...     print('My exception occurred, value:', e.value)
+...
+My exception occurred, value: 4
+>>> raise MyError('oops!')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+__main__.MyError: 'oops!'
+```
+在这个例子中，`Exception` 默认的 `__init__()` 被覆盖。新的方式简单的创建 `value` 属性。这就替换了原来创建 `args` 属性的方式。
+
+异常类中可以定义任何其它类中可以定义的东西，但是通常为了保持简单，只在其中加入几个属性信息，以供异常处理句柄提取。如果一个新创建的模块中需要抛出几种不同的错误时，一个通常的作法是为该模块定义一个异常基类，然后针对不同的错误类型派生出对应的异常子类:
+``` python
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+class InputError(Error):
+    """Exception raised for errors in the input.
+
+    Attributes:
+        expression -- input expression in which the error occurred
+        message -- explanation of the error
+    """
+
+    def __init__(self, expression, message):
+        self.expression = expression
+        self.message = message
+
+class TransitionError(Error):
+    """Raised when an operation attempts a state transition that's not
+    allowed.
+
+    Attributes:
+        previous -- state at beginning of transition
+        next -- attempted new state
+        message -- explanation of why the specific transition is not allowed
+    """
+
+    def __init__(self, previous, next, message):
+        self.previous = previous
+        self.next = next
+        self.message = message
+```
+与标准异常相似，大多数异常的命名都以 `Error` 结尾。
+
+很多标准模块中都定义了自己的异常，用以报告在他们所定义的函数中可能发生的错误。关于类的进一步信息请参见 类 一章。
+
+### 定义清理行为
+`try` 语句还有另一个可选的子句，目的在于定义在任何情况下都一定要执行的功能。例如:
+``` python
+>>> try:
+...     raise KeyboardInterrupt
+... finally:
+...     print('Goodbye, world!')
+...
+Goodbye, world!
+KeyboardInterrupt
+```
+
+不管有没有发生异常，`finally` 子句 在程序离开 `try` 后都一定会被执行。当 `try` 语句中发生了未被 `except` 捕获的异常（或者它发生在 `except` 或 `else` 子句中），在 `finally` 子句执行完后它会被重新抛出。 `try` 语句经由 `break` ，`continue` 或 `return` 语句退 出也一样会执行 `finally` 子句。以下是一个更复杂些的例子（在同 一个 `try` 语句中的 `except` 和 `finally` 子句的工作方式与 Python 2.5 一样）:
+``` python
+>>> def divide(x, y):
+...     try:
+...         result = x / y
+...     except ZeroDivisionError:
+...         print("division by zero!")
+...     else:
+...         print("result is", result)
+...     finally:
+...         print("executing finally clause")
+...
+>>> divide(2, 1)
+result is 2
+executing finally clause
+>>> divide(2, 0)
+division by zero!
+executing finally clause
+>>> divide("2", "1")
+executing finally clause
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+  File "<stdin>", line 3, in divide
+TypeError: unsupported operand type(s) for /: 'str' and 'str'
+```
+如你所见， `finally` 子句在任何情况下都会执行。`TypeError` 在两个字符串相除的时候抛出，未被 `except` 子句捕获，因此在 `finally` 子句执行完毕后重新抛出。
+
+在真实场景的应用程序中，`finally` 子句用于释放外部资源（文件 或网络连接之类的），无论它们的使用过程中是否出错。
+
+### 预定义清理行为
+
+``` python
+with open("myfile.txt") as f:
+    for line in f:
+        print(line)
+```
+语句执行后，文件 `f` 总会被关闭，即使是在处理文件中的数据时出错也一样。其它对象是否提供了预定义的清理行为要查看它们的文档。
+
 # TODO
 
 ## unicode
-
+## pickle
+## file
 ---
 
 ```
@@ -965,3 +1196,16 @@ super( CustomImageStorage,self).save(name, content)
 
 `py.test tests/api/test_accounts.py::AccountsApiTest::test_update_account_intro`
 
+
+## log
+``` python
+import logging
+logging.basicConfig(
+       filename = ('/tmp/lian.log'),
+       level = logging.INFO,
+       filemode = 'w',
+       format = '[%(filename)s:%(lineno)d] %(asctime)s - %(levelname)s: %(message)s'
+   )
+
+logging.error(e)
+```
