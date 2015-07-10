@@ -986,3 +986,19 @@ var x = a || b && c
 ### 三元运算符 `true ? if_true_value : if_false_value`
 
 ### extend an object `$.extend(item, {'is_user_perm': false})`
+
+
+
+```
+$.ajax({
+    url: Common.getUrl({name: 'lock_file', repo_id: dir.repo_id}) + '?path=' + encodeURIComponent(filepath),
+    type: 'PUT',
+    dataType: 'json',
+//    data: {'operation': 'lock', 'p': encodeURIComponent(filepath)},
+    data: {'operation': 'lock', 'p': filepath},
+    }
+});
+```
+- `url` 中的参数 `path` 需要 `encodeURIComponent()`，参数传给 `django` 后，在 `request.GET.get()` 前，`django` 会做 `decode` 处理，所以直接通过 `request.GET.get()` 获取参数即可
+- 通过 `data: {'operation': 'lock', 'p': filepath}` 这种形式传递参数，不需要 `encodeURIComponent()`， `django` 中直接通过 `request.POST/DATA.get()` 直接取出即可；若使用了 `encodeURIComponent(path)`， 需要 `path = urllib2.unquote(path.encode('utf-8'))`
+
