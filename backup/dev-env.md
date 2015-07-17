@@ -4,7 +4,7 @@
 cd ~/dev/libsearpc
 ./autogen.sh
 ./configure
-make
+make -j4
 make install
 ```
 - Compile ccnet with
@@ -13,7 +13,7 @@ make install
 cd ~/dev/ccnet
 ./autogen.sh
 ./configure --disable-client --enable-server --enable-ldap
-make
+make -j4
 make install
 ```
 
@@ -25,6 +25,8 @@ make install
 cd ~/dev/seafile
 ./autogen.sh
 ./configure --disable-client --enable-server
-make
+make -j4
 make install
 ```
+
+> sudo make clean

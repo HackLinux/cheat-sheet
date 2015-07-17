@@ -1,8 +1,33 @@
+[toc]
+
 # Django
 
 `pip install Django==1.7.1`
 
 `django.utils.six.moves.urllib` doesnt exist in django==1.5.1 yet. You can try to upgrade django to 1.5.7 for example. Then this import will work.
+
+
+## from django.utils.http import urlquote
+
+``` python
+def urlquote(url, safe='/'):
+    """
+    A version of Python's urllib.quote() function that can operate on unicode
+    strings. The url is first UTF-8 encoded before quoting.
+    """
+```
+
+``` python
+urllib.quote(string[, safe])
+```
+
+Replace special characters in string using the `%xx` escape. Letters, digits, and the characters `_.-` are never quoted. By default, this function is intended for quoting the path section of the URL. The optional safe parameter specifies additional characters that should not be quoted — its default value is `/`.
+
+- Example: `quote('/~connolly/')` yields `'/%7econnolly/'`.
+
+- `urllib.unquote()` returns a bytestring, and it is up to you to decode it from `UTF-8`.
+- `urllib.quote()` expects a bytestring too, it handles unicode just fine if you encode the unicode string to `UTF-8` first.
+
 
 ## Url
 
