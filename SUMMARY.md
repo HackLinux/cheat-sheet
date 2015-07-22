@@ -19,5 +19,5 @@
 * [Regex]
    * [Regex](Regex/regex.md)
 * [Other]
-   * [Other](Other/other.md)
+   * [encode](Other/encode.md)
    * [Translate](Other/translate.md)
