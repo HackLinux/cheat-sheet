@@ -13,7 +13,7 @@
 def urlquote(url, safe='/'):
     """
     A version of Python's urllib.quote() function that can operate on unicode
-    strings. The url is first UTF-8 encoded before quoting.
+    strings. The url is first UTF-8 encoded before quoting. 
     """
 ```
 
@@ -25,9 +25,24 @@ Replace special characters in string using the `%xx` escape. Letters, digits, an
 
 - Example: `quote('/~connolly/')` yields `'/%7econnolly/'`.
 
-- `urllib.unquote()` returns a bytestring, and it is up to you to decode it from `UTF-8`.
+- `urllib.unquote()` returns a bytestring, and it is up to you to decode it from `UTF-8`. 
 - `urllib.quote()` expects a bytestring too, it handles unicode just fine if you encode the unicode string to `UTF-8` first.
 
+## from django.utils.http import urlquote
+
+``` python
+def urlencode(query, doseq=0):
+    """
+    A version of Python's urllib.urlencode() function that can operate on
+    unicode strings. The parameters are first cast to UTF-8 encoded strings and
+    then encoded as per normal.
+    """
+```
+``` python
+urllib.urlencode(query[, doseq])
+```
+
+Convert a mapping object or a sequence of two-element tuples to a “percent-encoded” string, suitable to pass to `urlopen()` above as the optional data argument. This is useful to pass a dictionary of form fields to a `POST` request. The resulting string is a series of `key=value`pairs separated by `&` characters, where both key and value are quoted using `quote_plus()` above. When a sequence of two-element tuples is used as the query argument, the first element of each tuple is a key and the second is a value. The value element in itself can be a sequence and in that case, if the optional parameter doseq is evaluates to True, individual `key=value` pairs separated by `&` are generated for each element of the value sequence for the key. The order of parameters in the encoded string will match the order of parameter tuples in the sequence. The `urlparse` module provides the functions `parse_qs()` and `parse_qsl()` which are used to parse query strings into Python data structures.
 
 ## Url
 
