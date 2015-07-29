@@ -11,7 +11,8 @@
 * [Git]
    * [Git](Git/git.md)
 * [Python]
-   * [Python](Python/python.md)
+   * [Python Basic](Python/python.md)
+   * [StringIO](Python/StringIO.md)
    * [Django](Python/django.md)
 * [Js]
    * [Js](Js/js.md)
